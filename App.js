@@ -1,105 +1,74 @@
-import React, {useState } from "react";
-import {
-  View,
-  Dimensions,
-  Animated
-} from "react-native";
-import {createAppContainer} from 'react-navigation'
-import {BottomTabBar, createBottomTabNavigator} from 'react-navigation-tabs'
-import {Ionicons} from 'react-native-vector-icons'
-import {ScreenOne, ScreenTwo, ScreenThree} from './Screens'
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import TopNews from './screens/TopNews';
+import OneNews from './screens/OneNews';
+import Categories from './screens/Categories';
+import Search from './screens/Search';
 
-const App = () => {
-  const AppContainer = createAppContainer(bottomNavigator)
-  return(
-    <AppContainer />
-  )
+const Stack = createStackNavigator();
+const Tab = createMaterialBottomTabNavigator();
+
+function TabStack() {
+  return (
+    <Tab.Navigator
+        initialRouteName="TopNews"
+        activeColor="#f0edf6"
+        inactiveColor="#594F4F"
+        barStyle={{ backgroundColor: '#45ADA8' }}>
+        <Tab.Screen name="Top News" component={TopNews}
+        options={{
+          tabBarLabel: 'Top News',
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="newspaper" color={color} size={20} />
+          ),
+        }}/>
+        <Tab.Screen name="Categories" component={Categories} 
+        options={{
+          tabBarLabel: 'Categories',
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="category" color={color} size={20} />
+          ),
+        }}/>
+        <Tab.Screen
+        name="Search"
+        component={Search}
+        options={{
+          tabBarLabel: 'Search',
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="search" color={color} size={20} />
+          ),
+        }}
+      />
+      </Tab.Navigator>
+  );
 }
 
-const CustomBottomBar = (props) =>{
-  //We use the spread operator to pass down all default properties of a bottom bar
-
-  //custom styles for our indicator
-  //The width of the indicator should be of equal size with each tab button. We have 3 tab buttons therefore, the width of a single tab button would be the total width Dimension of the screen divided by 3
-
-  const {width} = Dimensions.get('screen')
-
-  //Create an animated value 
-  const [position] = useState(new Animated.ValueXY())
-
-  //We attach the x,y coordinates of the position to the transform property of the indicator so we can freely animate it to any position of our choice.
-  const animStyles = {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      bottom:0,
-      width: width/3,
-      backgroundColor: 'rebeccapurple',
-      transform: position.getTranslateTransform()
-  }
-
-  const animate = (value, route) =>{
-      //navigate to the selected route on click
-      props.navigation.navigate(route)
-
-      //animate indicator
-      Animated.timing(position, {
-          toValue: {x: value, y: 0},
-          duration: 300,
-          useNativeDriver: true
-      }).start()
-  }
-
-  return(
-      <View>
-      <Animated.View style={animStyles} />
-      <BottomTabBar {...props} onTabPress={({route}) =>{
-          switch(route.key){
-              case 'Home':
-              //animated position should be 0
-                   animate(0, route.key)
-                   break
-                   case 'Notifications':
-                   //animated position is width/3
-                    animate(width/3 , route.key)
-                    break
-                    case 'Profile':
-                    //animated position is width of screen minus width of single tab button
-                     animate(width - (width/3), route.key)
-                     break
-          }
-      }} style={{backgroundColor: 'transparent'}} />
-      </View>
-  )
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName="Top News"
+        screenOptions={{
+          headerStyle: { backgroundColor: '#45ADA8' },
+          headerTitleAlign: "center",
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' }
+        }}>
+        <Stack.Screen
+          name="TopNews"
+          component={TabStack}
+          options={{title: "Top News"}}
+        />
+        <Stack.Screen
+          name="OneNews"
+          component={OneNews}
+        />
+      </Stack.Navigator>
+      
+    </NavigationContainer>
+  );
 }
-
-const config= {
-  tabBarOptions:{
-  activeTintColor: '#fff',
-  inactiveTintColor: 'rgba(0,0,0,0.7)'
-},
-tabBarComponent: (props) => <CustomBottomBar {...props} />
-}
-
-const bottomNavigator = createBottomTabNavigator({
-  Home:{
-    screen: ScreenOne,
-    navigationOptions:{
-      tabBarIcon: ({tintColor}) => <Ionicons name='md-home' color={tintColor} size={24} />
-    }
-  },
-  Notifications:{
-    screen: ScreenTwo,
-    navigationOptions:{
-      tabBarIcon: ({tintColor}) => <Ionicons name='md-notifications' color={tintColor} size={24} />
-    }
-  },
-  Profile:{
-    screen: ScreenThree,
-    navigationOptions:{
-      tabBarIcon: ({tintColor}) => <Ionicons name='md-person' color={tintColor} size={24} />
-    }
-  }
-}, config)
-
-export default App;
