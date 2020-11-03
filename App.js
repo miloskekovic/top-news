@@ -12,6 +12,7 @@ import Search from './screens/Search';
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 
+
 function TabStack() {
   return (
     <Tab.Navigator
@@ -43,7 +44,7 @@ function TabStack() {
           ),
         }}
       />
-      </Tab.Navigator>
+    </Tab.Navigator>
   );
 }
 

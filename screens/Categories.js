@@ -2,19 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Image, Button, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import SwitchSelector from 'react-native-switch-selector';
+import WebView from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
-
-const url = 'https://newsapi.org/v2/top-headlines?'
-const apiKey = 'ad68b3d162644de090d32975e290d748'
+import * as parameters from '../utils/parameters'
+const url = parameters.mainPartOfURL
+const apiKey = parameters.apiKey
 
 const categories = ['entertainment', 'general', 'health', 'science', 'sports', 'technology']
-const options = [
-  { label: 'GB', value: 'gb' },
-  { label: 'US', value: 'us' },
-];
+let countries = ['gb', 'us']
 
-const SLIDER_WIDTH = Dimensions.get('window').width;
-const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
+const screenWidth = Dimensions.get('window').width;
+const ITEM_WIDTH = Math.round(screenWidth * 0.7);
 const ITEM_HEIGHT = Math.round(ITEM_WIDTH * 3 / 4);
 
 async function fetchFunction (categoryUrl)  {
@@ -26,8 +24,8 @@ async function fetchFunction (categoryUrl)  {
       newArray.push({
         'title': article.title,
         'urlToImage': article.urlToImage,
-        'description': article.description,
-        'content': article.content,
+        'description': article.description == null ? '' : article.description,
+        'content': article.content == null ? '' : article.content,
       });
     });
     return newArray;
@@ -54,8 +52,6 @@ const Categories = () => {
   
   async function fetchDataFromURL ()  {
     let mainPartOfURL = url.substring(0, url.indexOf('?') + 1)
-    let countries = ['gb', 'us']
-    //let categories = ['entertainment', 'general', 'health', 'science', 'sports', 'technology']
     var allArticles = {};
     for(let country of countries){
       allArticles[country] = {}
@@ -66,10 +62,6 @@ const Categories = () => {
         allArticles[country][category].push(result);  
       }
     } 
-    //console.log(allArticles.gb.entertainment)
-    //await Promise.all(allArticles);
-    //setNewsByCountries(allArticles[selectedCountry]['entertainment'])
-    //console.log(entertainment['gb']['entertainment'])
     setNewsByCountries(allArticles)
     setLoading(false)
   }
@@ -81,7 +73,7 @@ const Categories = () => {
             //ref={(c) => setCarousel1(c)}
             data={newsByCountries[selectedCountry][category][0]}
             renderItem={_renderItem}
-            sliderWidth={SLIDER_WIDTH}
+            sliderWidth={screenWidth}
             itemWidth={ITEM_WIDTH}
             containerCustomStyle={styles.carouselContainer}
             inactiveSlideShift={0}
@@ -97,15 +89,25 @@ const Categories = () => {
   function _renderItem({ item, index }) {
     //console.log(newsByCountries[selectedCountry]['entertainment'])
     return (
-      <View style={[styles.itemContainer, { backgroundColor: '#547980' }]}>
-        <Text style={styles.itemTitle}>{item.title}</Text>
-        <Image style={styles.itemImage}
+      <View style={[parameters.styles.itemContainer, { backgroundColor: '#547980' }]}>
+        <WebView 
+          scrollEnabled={false}
+          bounces={false}
+          style={parameters.styles.itemTitle}
+          source={{ html: `<p style='text-align: justify; color: #9DE0AD; font-size: ${parameters.fontSizer(screenWidth)*3.5}'>${item.title}</p>` }}
+        />    
+        <Image style={parameters.styles.itemImage}
           source={{ uri: item.urlToImage }}
         />
-        <Text style={styles.itemDescription}>{item.description}</Text>
-        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+        <WebView 
+          scrollEnabled={false}
+          bounces={false}
+          style={parameters.styles.itemDescription}
+          source={{ html: `<p style='text-align: justify; color: white; font-size: ${parameters.fontSizer(screenWidth)*2.5}'>${item.description}</p>` }}
+        />       
+        <View>
           <Button
-            style={styles.more}
+            style={parameters.styles.buttonMore}
             title='More >'
             onPress={() => navigation.navigate('OneNews', {selectedLanguage: selectedCountry, openedNews: item})}
           />
@@ -135,7 +137,7 @@ const Categories = () => {
     return(      
       <View style={styles.container}>
         <Image
-          style={{width: SLIDER_WIDTH/3, height: SLIDER_WIDTH/3,}}
+          style={{width: screenWidth/3, height: screenWidth/3,}}
           source={{uri: 'https://i.gifer.com/YCZH.gif'}} />
       </View>
     ) 
@@ -143,30 +145,30 @@ const Categories = () => {
     return (
       //<View style={{ flex: 1, padding: '5%' }}>
         <ScrollView style={{ padding: '5%' }}>
-          <SwitchSelector style={styles.switchSelector} options={options} initial={0} buttonColor='#45ADA8' onPress={value => selectedCountry == 'gb' ? setSelectedCountry('us') : setSelectedCountry('gb')} />
-          <Text style={{fontSize: 16}}>Top 5 news by categories from {selectedCountry == 'us' ? 'US' : 'GB'}</Text>
+          <SwitchSelector style={styles.switchSelector} options={parameters.availableCountries} initial={0} buttonColor='#45ADA8' onPress={value => setSelectedCountry(value)} />
+          <Text style={{fontSize: 16}}>{'\u2022'} Top 5 news by categories from {selectedCountry == 'us' ? 'US' : 'GB'}</Text>
           <TouchableOpacity style={styles.button} onPress={ () => onCategoryClick(categories[0]) }>
-            <Text style={styles.underline}>Entertainment</Text>
+            <Text style={styles.underline}>{'\u2022'} Entertainment</Text>
           </TouchableOpacity>
           {showCarouselForCategory(categories[0])}
           <TouchableOpacity style={styles.button} onPress={ () => onCategoryClick(categories[1]) }>
-            <Text style={styles.underline}>General</Text>
+            <Text style={styles.underline}>{'\u2022'} General</Text>
           </TouchableOpacity>
           {showCarouselForCategory(categories[1])}
           <TouchableOpacity style={styles.button} onPress={ () => onCategoryClick(categories[2]) }>
-            <Text style={styles.underline}>Health</Text>
+            <Text style={styles.underline}>{'\u2022'} Health</Text>
           </TouchableOpacity>
           {showCarouselForCategory(categories[2])}
           <TouchableOpacity style={styles.button} onPress={ () => onCategoryClick(categories[3]) }>
-            <Text style={styles.underline}>Science</Text>
+            <Text style={styles.underline}>{'\u2022'} Science</Text>
           </TouchableOpacity>
           {showCarouselForCategory(categories[3])}
           <TouchableOpacity style={styles.button} onPress={ () => onCategoryClick(categories[4]) }>
-            <Text style={styles.underline}>Sport</Text>
+            <Text style={styles.underline}>{'\u2022'} Sport</Text>
           </TouchableOpacity>
           {showCarouselForCategory(categories[4])}
           <TouchableOpacity style={styles.button} onPress={ () => onCategoryClick(categories[5]) }>
-            <Text style={styles.underline}>Technology</Text>
+            <Text style={styles.underline}>{'\u2022'} Technology</Text>
           </TouchableOpacity>
           {showCarouselForCategory(categories[5])}
         </ScrollView>
@@ -197,22 +199,8 @@ const styles = StyleSheet.create({
       alignSelf: "center"
   },
   carouselContainer: {
-    marginTop: 50
-  },
-  itemTitle: {
-    color: '#fff',
-    fontWeight: '100',
-  },
-  itemDescription: {
-    fontWeight: '100',
-    fontSize: 12,
-    color: 'orange',
-  },
-  more: {
-    fontWeight: '200',
-    fontSize: 12,
-    color: '#000',
-    alignSelf: "flex-end"
+    marginTop: '5%',
+    marginBottom: '5%'
   },
 });
 

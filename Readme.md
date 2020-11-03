@@ -1,0 +1,1 @@
+In utils/parameters.js I declare my API key. I was limited to 100 requests per day, so I had to change my API every time I reached the limit. If limit is reached, mobile application will not work corectly and you will have to change API key inside utils/parameters.js
