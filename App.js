@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import TopNews from './screens/TopNews';
@@ -10,31 +10,35 @@ import Categories from './screens/Categories';
 import Search from './screens/Search';
 
 const Stack = createStackNavigator();
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 
 
 function TabStack() {
   return (
     <Tab.Navigator
-        initialRouteName="TopNews"
-        activeColor="#f0edf6"
-        inactiveColor="#594F4F"
-        barStyle={{ backgroundColor: '#45ADA8' }}>
-        <Tab.Screen name="Top News" component={TopNews}
+      initialRouteName="Top News"
+      activeColor="#f0edf6"
+      inactiveColor="#594F4F"
+      barStyle={{ backgroundColor: '#45ADA8' }}>
+      <Tab.Screen name="Top News" component={TopNews}
         options={{
           tabBarLabel: 'Top News',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="newspaper" color={color} size={20} />
           ),
-        }}/>
-        <Tab.Screen name="Categories" component={Categories} 
+        }}
+      />
+      <Tab.Screen 
+        name="Categories" 
+        component={Categories} 
         options={{
           tabBarLabel: 'Categories',
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="category" color={color} size={20} />
           ),
-        }}/>
-        <Tab.Screen
+        }}
+      />
+      <Tab.Screen
         name="Search"
         component={Search}
         options={{
@@ -60,9 +64,12 @@ export default function App() {
           headerTitleStyle: { fontWeight: 'bold' }
         }}>
         <Stack.Screen
-          name="TopNews"
+          name="Top News"
           component={TabStack}
-          options={{title: "Top News"}}
+        />
+        <Stack.Screen
+          name="Categories"
+          component={Categories}
         />
         <Stack.Screen
           name="OneNews"

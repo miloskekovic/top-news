@@ -5,8 +5,9 @@ import SwitchSelector from 'react-native-switch-selector';
 import WebView from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
 import * as parameters from '../utils/parameters'
+import { Article, ArticleTitle, ArticleImage, ArticleDescription, ArticleButton, ArticleButtonText } from '../utils/components';
 
-const SLIDER_WIDTH = Dimensions.get('window').width;
+const screenWidth = Dimensions.get('window').width;
 
 
 const mainPartOfURL = parameters.mainPartOfURL;
@@ -86,43 +87,27 @@ const Search = () => {
       <SwitchSelector style={styles.switchSelector} options={parameters.availableCountries} initial={0} buttonColor='#45ADA8' onPress={ value => setSelectedCountry(value)} />
       <Text style={{fontSize: 16, marginTop: '2.5%'}}>{'\u2022'} Search top news from {selectedCountry.toUpperCase()} by term:</Text>
       <TextInput
-        style={{ width: SLIDER_WIDTH * 0.8, height: 40, borderColor: 'black', alignSelf: "center", marginTop: '2.5%', borderWidth: 1, backgroundColor: 'lightgrey' }}
+        style={{ width: screenWidth * 0.8, height: 40, borderColor: 'black', alignSelf: "center", marginTop: '2.5%', borderWidth: 1, backgroundColor: 'lightgrey' }}
         placeholder="Search term..."
         onChangeText={text => setTerm(text)}
         //value={value}
       />
       <FlatGrid
-        itemDimension={130}
+        itemDimension={screenWidth * 0.33}
         data={newsByCountryAndCriteria}
         style={styles.gridView}
         // staticDimension={300}
         // fixed
         // spacing={20}
         renderItem={({ item, index }) => (
-          <View style={[styles.itemContainer, { backgroundColor: '#547980' }]}>
-            <WebView 
-              scrollEnabled={false}
-              bounces={false}
-              style={parameters.styles.itemTitle}
-              source={{ html: `<p style='text-align: justify; color: #9DE0AD; font-size: 52'>${item.title}</p>` }}
-            />    
-            <Image style={parameters.styles.itemImage}
-              source={{uri: item.urlToImage }}
-            />
-            <WebView 
-              scrollEnabled={false}
-              bounces={false}
-              style={parameters.styles.itemDescription}
-              source={{ html: `<p style='text-align: justify; color: white; font-size: 46'>${item.description}</p>` }}
-            />    
-            <View>
-              <Button
-                style={parameters.styles.more}
-                title='More >'
-                onPress={() => navigation.navigate('OneNews', {selectedLanguage: selectedCountry, openedNews: item})}
-              />
-            </View>
-          </View>
+          <Article>
+            <ArticleTitle>{item.title}</ArticleTitle>
+            <ArticleImage source={{uri: item.urlToImage}} />
+            <ArticleDescription>{item.description}</ArticleDescription>
+            <ArticleButton onPress={() => navigation.navigate('OneNews', {selectedCountry: selectedCountry, openedNews: item})}>
+              <ArticleButtonText>{'More >>'}</ArticleButtonText>
+            </ArticleButton>
+          </Article>
         )}
       />
     </View>

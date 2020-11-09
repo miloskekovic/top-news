@@ -1,70 +1,73 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, Image, Button, ScrollView  } from 'react-native';
+import { StyleSheet, Text, View, Image, Button, ScrollView, Dimensions } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
+import { useNavigation } from '@react-navigation/native';
 import * as parameters from '../utils/parameters'
+import { OpenedArticle, OpenedArticleTitle, OpenedArticlePublishedAt, OpenedArticleImage, OpenedArticleContent, OpenedArticleButton, OpenedArticleButtonText } from '../utils/components';
+
+const screenWidth = Dimensions.get('window').width;
+const ITEM_WIDTH = Math.round(screenWidth * 0.7);
+const screenHeight = Dimensions.get('window').height;
+const ITEM_HEIGHT = Math.round(ITEM_WIDTH * 3 / 4);
+
+
 
 function OneNews({ navigation, route }) {
-    console.log(route.params.openedNews.title)
+    const dateToStr = (date) => {
+        var d = new Date(date);
+        return d.getDate()  + "/" + (d.getMonth()+1) + "/" + d.getFullYear() + " " +
+        d.getHours() + ":" + d.getMinutes();
+    };
     return (
-        <ScrollView>
-            <SwitchSelector style={styles.switchSelector} options={parameters.availableCountries} initial={route.params.selectedLanguage == 'gb' ? 0 : 1} disabled={true} buttonColor='#ff0000' backgroundColor='#ff4c4c' onPress={value => fetchDataLocal(value)} />
-            <Text style={styles.itemTitle}>{route.params.openedNews.title}</Text>
-            <Image style={styles.itemImage}
-                source={{ uri: route.params.openedNews.urlToImage }}
-            />
-            <Text style={styles.itemContent}>{route.params.openedNews.content}</Text>
-            <View style={styles.backToList}>
-                <Button
-                style={{flex: 1}}
-                title='< Back to list'
-                onPress={() => navigation.navigate('TopNews')}
-                />
-            </View>
-        </ScrollView>
-    );
+        <View style={{flex: 1}}>
+            <SwitchSelector style={{width: '33%', alignSelf: "center", marginTop: '5%'}} options={parameters.availableCountries} initial={0} disabled={true} buttonColor='#45ADA8' onPress={ (value) => {console.log(value); setCountry(value), fetchDataFromURL(value)}} />
+            <OpenedArticle>
+                <OpenedArticleTitle>{route.params.openedNews.title}</OpenedArticleTitle>
+                <OpenedArticlePublishedAt>{dateToStr(route.params.openedNews.publishedAt)}</OpenedArticlePublishedAt>
+                <OpenedArticleImage source={{uri: route.params.openedNews.urlToImage}} />
+                <OpenedArticleContent>{route.params.openedNews.content}</OpenedArticleContent>
+                <OpenedArticleButton onPress={() => navigation.navigate('Top News')}>
+                <OpenedArticleButtonText>{'<< Back to list'}</OpenedArticleButtonText>
+                </OpenedArticleButton>
+            </OpenedArticle>
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex:1
-    },
-    scrollView: {
-      backgroundColor: '#2F9599',
-      marginHorizontal: '5%',   
-    },
     switchSelector: {
         marginTop: 10,
         marginBottom: 10,
-        width: '50%',
+        width: screenWidth * 0.5,
         alignSelf: "center"
     },
     itemTitle: {
         flex: 1,
-        width: '90%',
+        width: screenWidth * 0.9,
         color: '#000',
-        fontSize: 20,
+        fontSize: parameters.fontSizer(screenWidth) * 3,
         alignSelf: 'center',
     },
     itemImage: {
         flex: 1,
-        width: '90%',
-        height: 200,
+        width: screenWidth * 0.9,
+        height: screenHeight/3,
         resizeMode: 'stretch',
         alignSelf: 'center'
     },
     itemContent: {
         flex: 1,
-        width: '90%',
+        width: screenWidth * 0.9,
         fontSize: 15,
         color: '#000',
         alignSelf: 'center'
     },
     backToList: {
         flex: 1,
-        width: '90%',
+        width: screenWidth * 0.9,
         backgroundColor: 'orange',
-        marginTop: '5%',
-        marginBottom: '5%',
+        marginTop: 15,
+        marginBottom: 15,
         alignSelf: 'center'
     },
 });

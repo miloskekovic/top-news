@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Image, Button, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import SwitchSelector from 'react-native-switch-selector';
-import WebView from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
 import * as parameters from '../utils/parameters'
+import { Article, ArticleTitle, ArticleImage, ArticleDescription, ArticleButton, ArticleButtonText } from '../utils/components';
+
 const url = parameters.mainPartOfURL
 const apiKey = parameters.apiKey
 
@@ -12,8 +13,6 @@ const categories = ['entertainment', 'general', 'health', 'science', 'sports', '
 let countries = ['gb', 'us']
 
 const screenWidth = Dimensions.get('window').width;
-const ITEM_WIDTH = Math.round(screenWidth * 0.7);
-const ITEM_HEIGHT = Math.round(ITEM_WIDTH * 3 / 4);
 
 async function fetchFunction (categoryUrl)  {
   try {
@@ -74,7 +73,7 @@ const Categories = () => {
             data={newsByCountries[selectedCountry][category][0]}
             renderItem={_renderItem}
             sliderWidth={screenWidth}
-            itemWidth={ITEM_WIDTH}
+            itemWidth={screenWidth * 0.33}
             containerCustomStyle={styles.carouselContainer}
             inactiveSlideShift={0}
             //onSnapToItem={(index) => setEntertainmentIndex({ index })}
@@ -89,29 +88,15 @@ const Categories = () => {
   function _renderItem({ item, index }) {
     //console.log(newsByCountries[selectedCountry]['entertainment'])
     return (
-      <View style={[parameters.styles.itemContainer, { backgroundColor: '#547980' }]}>
-        <WebView 
-          scrollEnabled={false}
-          bounces={false}
-          style={parameters.styles.itemTitle}
-          source={{ html: `<p style='text-align: justify; color: #9DE0AD; font-size: ${parameters.fontSizer(screenWidth)*3.5}'>${item.title}</p>` }}
-        />    
-        <Image style={parameters.styles.itemImage}
-          source={{ uri: item.urlToImage }}
-        />
-        <WebView 
-          scrollEnabled={false}
-          bounces={false}
-          style={parameters.styles.itemDescription}
-          source={{ html: `<p style='text-align: justify; color: white; font-size: ${parameters.fontSizer(screenWidth)*2.5}'>${item.description}</p>` }}
-        />       
-        <View>
-          <Button
-            style={parameters.styles.buttonMore}
-            title='More >'
-            onPress={() => navigation.navigate('OneNews', {selectedLanguage: selectedCountry, openedNews: item})}
-          />
-        </View>
+      <View style={[styles.itemContainer, { backgroundColor: '#547980' }]}>
+        <Article>
+            <ArticleTitle>{item.title}</ArticleTitle>
+            <ArticleImage source={{uri: item.urlToImage}} />
+            <ArticleDescription>{item.description}</ArticleDescription>
+            <ArticleButton onPress={() => navigation.navigate('OneNews', {selectedCountry: selectedCountry, openedNews: item})}>
+              <ArticleButtonText>{'More >>'}</ArticleButtonText>
+            </ArticleButton>
+          </Article>
       </View>
     );
   }

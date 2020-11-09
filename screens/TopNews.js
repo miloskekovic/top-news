@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, Button, Dimensions } from 'react-native';
+import { StyleSheet, View, Dimensions } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
-import WebView from 'react-native-webview';
 import { FlatGrid } from 'react-native-super-grid';
 import { useNavigation } from '@react-navigation/native';
+import { Article, ArticleTitle, ArticleImage, ArticleDescription, ArticleButton, ArticleButtonText } from '../utils/components';
+
 import * as parameters from '../utils/parameters'
 
 const mainPartOfURL = parameters.mainPartOfURL;
@@ -12,15 +13,15 @@ const screenWidth = Dimensions.get('window').width;
 const ITEM_WIDTH = Math.round(screenWidth * 0.7);
 const ITEM_HEIGHT = Math.round(ITEM_WIDTH * 3 / 4);
 
-
 function TopNews (){
-  const navigation = useNavigation();
   const [country, setCountry] = useState('gb');
   const [items, setItems] = useState([]);
+  const navigation = useNavigation();
 
   const fetchDataFromURL = (value) => {
     const news = [];
       console.log(`You choosed ${value}`);
+      console.log('Širina zaslona:', screenWidth);
       let searchCriteria = 'country='.concat(value).concat('&').concat('apiKey=').concat(apiKey);
       let newUrl = mainPartOfURL.concat(searchCriteria)
       fetch(newUrl, {
@@ -34,6 +35,7 @@ function TopNews (){
                 title: article.title,
                 urlToImage: article.urlToImage,
                 description: article.description == null ? '' : article.description,
+                publishedAt: article.publishedAt == null ? '' : article.publishedAt,
                 content: article.content == null ? '' : article.content,
               })
             })
@@ -50,37 +52,20 @@ function TopNews (){
     fetchDataFromURL(country)
   }, [])
   return (
-    <View style={styles.container}>
-      <SwitchSelector style={styles.switchSelector} options={parameters.availableCountries} initial={0} buttonColor='#45ADA8' onPress={ (value) => {console.log(value); setCountry(value), fetchDataFromURL(value)}} />
+    <View style={{padding: '1%', flex: 1,}}>
+      <SwitchSelector style={{width: '33%', alignSelf: "center"}} options={parameters.availableCountries} initial={0} buttonColor='#45ADA8' onPress={ (value) => {console.log(value); setCountry(value), fetchDataFromURL(value)}} />
       <FlatGrid
-        itemDimension={parameters.fontSizer(screenWidth) * 9}
+        itemDimension={screenWidth * 0.33}
         data={items}
-        style={styles.gridView}
-        renderItem={({ item, index }) => (
-          <View style={[parameters.styles.itemContainer, { backgroundColor: '#547980' }]}>
-            <WebView 
-              scrollEnabled={false}
-              bounces={false}
-              style={parameters.styles.itemTitle}
-              source={{ html: `<p style='text-align: justify; color: #9DE0AD; font-size: 52'>${item.title}</p>` }}
-            />            
-            <Image style={parameters.styles.itemImage}
-              source={{uri: item.urlToImage }}
-            />
-            <WebView 
-              scrollEnabled={false}
-              bounces={false}
-              style={parameters.styles.itemDescription}
-              source={{ html: `<p style='text-align: justify; color: white; font-size: 46'>${item.description}</p>` }}
-            />
-            <View>
-              <Button
-                style={parameters.styles.more}
-                title='More >'
-                onPress={() => navigation.navigate('OneNews', {selectedLanguage: country, openedNews: item})}
-              />
-            </View>
-          </View>
+        renderItem={({ item }) => (
+          <Article>
+            <ArticleTitle>{item.title}</ArticleTitle>
+            <ArticleImage source={{uri: item.urlToImage}} />
+            <ArticleDescription>{item.description}</ArticleDescription>
+            <ArticleButton onPress={() => navigation.navigate('OneNews', {selectedCountry: country, openedNews: item})}>
+              <ArticleButtonText>{'More >>'}</ArticleButtonText>
+            </ArticleButton>
+          </Article>
         )}
       />
     </View>
@@ -89,12 +74,8 @@ function TopNews (){
 
   const styles = StyleSheet.create({
     container: {
-      marginTop: 20,
+      padding: 2,
       flex: 1,
-    },
-    switchSelector: {
-      width: '50%',
-      alignSelf: "center"
     },
     gridView: {
       marginTop: 10,

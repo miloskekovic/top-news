@@ -186,6 +186,10 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    
+    compile 'com.facebook.fresco:animated-gif:1.+'
+    implementation 'com.facebook.fresco:animated-webp:2.0.0'
+    implementation 'com.facebook.fresco:webpsupport:2.0.0'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
